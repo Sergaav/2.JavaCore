@@ -36,39 +36,37 @@ public class Solution {
         }
         bufferedReader2.close();
 
-          for (int i = 0; i < list1.size() && i < list2.size(); i++) {
-                if (list1.get(i).equals(list2.get(i))) {
-                    lines.add(new LineItem(Type.SAME, list1.get(i)));
-                } else {
+        for (int i = 0; i < list1.size() && i < list2.size(); i++) {
+            if (list1.get(i).equals(list2.get(i))) {
+                lines.add(new LineItem(Type.SAME, list1.get(i)));
+            } else {
+                try {
+                    if (list1.get(i + 1).equals(list2.get(i))) {
+                        lines.add(new LineItem(Type.REMOVED, list1.get(i)));
+                        list2.add(i, null);
+                    } else if (list1.get(i).equals(list2.get(i + 1))) {
+                        lines.add(new LineItem(Type.ADDED, list2.get(i)));
+                        list1.add(i, null);
+                    }
+                } catch (Exception e) {
                     try {
-                        if (list1.get(i + 1).equals(list2.get(i))) {
-                            lines.add(new LineItem(Type.REMOVED, list1.get(i)));
-                            list2.add(i, null);
-                        }else if (list1.get(i).equals(list2.get(i + 1))) {
+                        if (list1.get(i).equals(list2.get(i + 1))) {
                             lines.add(new LineItem(Type.ADDED, list2.get(i)));
                             list1.add(i, null);
                         }
-                    } catch (Exception e) {
-                        try {
-                            if (list1.get(i).equals(list2.get(i + 1))) {
-                                lines.add(new LineItem(Type.ADDED, list2.get(i)));
-                                list1.add(i, null);
-                            }
 
-                        } catch (Exception ex) {
+                    } catch (Exception ex) {
 
-                        }
                     }
-
                 }
+
             }
-            if (list1.size() > list2.size() && list1.size()!=list2.size()) {
-                lines.add(new LineItem(Type.REMOVED, list1.get(list1.size() - 1)));
-            } else if (list1.size() < list2.size() && list1.size()!=list2.size()) {lines.add(new LineItem(Type.ADDED, list2.get(list2.size() - 1)));
-            }
-
-
-
+        }
+        if (list1.size() > list2.size() && list1.size() != list2.size()) {
+            lines.add(new LineItem(Type.REMOVED, list1.get(list1.size() - 1)));
+        } else if (list1.size() < list2.size() && list1.size() != list2.size()) {
+            lines.add(new LineItem(Type.ADDED, list2.get(list2.size() - 1)));
+        }
 
 
         for (LineItem lineItem : lines) {
