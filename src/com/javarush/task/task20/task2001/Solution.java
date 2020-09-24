@@ -12,7 +12,7 @@ public class Solution {
     public static void main(String[] args) {
         //исправьте outputStream/inputStream в соответствии с путем к вашему реальному файлу
         try {
-            File your_file_name = File.createTempFile("c:\\1\\1.dat", null);
+            File your_file_name = File.createTempFile("c:\\1\\file.txt", null);
             OutputStream outputStream = new FileOutputStream(your_file_name);
             InputStream inputStream = new FileInputStream(your_file_name);
 
@@ -67,11 +67,27 @@ public class Solution {
         }
 
         public void save(OutputStream outputStream) throws Exception {
-            //implement this method - реализуйте этот метод
+            PrintWriter writer = new PrintWriter(outputStream);
+            writer.println(name);
+            if (assets.size()>0){
+                writer.println("true");
+                for (Asset asset : assets){
+                    writer.println(asset.getName()+" "+asset.getPrice());
+                }
+            }else writer.println("false");
+            writer.flush();
         }
 
         public void load(InputStream inputStream) throws Exception {
-            //implement this method - реализуйте этот метод
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            name = reader.readLine();
+            boolean isAssats= reader.readLine().equals("true");
+            if (isAssats){
+                while (reader.ready()){
+                String [] temp = reader.readLine().split(" ");
+                assets.add(new Asset(temp[0],Double.parseDouble(temp[1])));
+            }}
+
         }
     }
 }
