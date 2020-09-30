@@ -12,12 +12,28 @@ public class Solution {
 
     public static Map<String, String> runtimeStorage = new HashMap<>();
 
+
+    public Solution() throws FileNotFoundException {
+    }
+
     public static void save(OutputStream outputStream) throws Exception {
-        //напишите тут ваш код
+        Properties property = new Properties();
+        for (Map.Entry<String,String> pair : runtimeStorage.entrySet()){
+            property.setProperty(pair.getKey(),pair.getValue());
+        }
+        property.store(outputStream,"YooHoo");
+
+
+
     }
 
     public static void load(InputStream inputStream) throws IOException {
-        //напишите тут ваш код
+        Properties property = new Properties();
+        property.load(inputStream);
+        for (Object key : property.keySet()){
+            runtimeStorage.put(key.toString(),property.getProperty(key.toString()));
+        }
+
     }
 
     public static void main(String[] args) {
