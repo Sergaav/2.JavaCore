@@ -9,28 +9,31 @@ import java.util.List;
 Алгоритмы-числа
 */
 public class Solution {
+    private static long S;
+    private static int N;
+    private static int[] digitsMultiSet;
+    private static int[] testMultiSet;
+
+    private static List<Long> results;
+    private static long maxPow;
+    private static long minPow;
+
+    private static long[][] pows;
 
 
-    private static long[][] myPow() {
-        long[][] myPow = new long[10][19];
-        for (int i = 0; i < 10; i++) {
-            for (int j = 1; j < 19; j++) {
-                myPow[i][j] = (long) Math.pow(i, j);
-            }
+
+    public static long[] getNumbers(long upperLimit) {
+        if (upperLimit <= 1) return new long[0];
+
+        S = upperLimit;
+        List<Long> armstrongList = generate(String.valueOf(S).length() + 1);
+        long[] result = new long[armstrongList.size()];
+
+        for (int i = 0; i < armstrongList.size(); i++) {
+            result[i] = armstrongList.get(i);
         }
-        return myPow;
-    }
-
-
-    public static long[] getNumbers(long N) {
-
-        long[] result = null;
-
-
-
         return result;
     }
-
 
     public static void main(String[] args) {
         long a = System.currentTimeMillis();
@@ -40,96 +43,92 @@ public class Solution {
         System.out.println("time = " + (b - a) / 1000);
 
         a = System.currentTimeMillis();
-        System.out.println(Arrays.toString(getNumbers(1000000000)));
+        System.out.println(Arrays.toString(getNumbers(Long.MAX_VALUE)));
         b = System.currentTimeMillis();
         System.out.println("memory " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (8 * 1024));
         System.out.println("time = " + (b - a) / 1000);
-
-
     }
 
-    public static boolean isMinNumber(long N) {
-        boolean isMinNumber = true;
+    private static List<Long> generate(int maxN) {
+        if (maxN >= 21) throw new IllegalArgumentException();
 
-        byte[] mas = masDigits(N, countDigits(N));
-        for (int i = 0; i < mas.length - 1; i++) {
-            if (mas[i] > mas[i + 1]) {
-                isMinNumber = false;
-                i = mas.length;
+        genPows(maxN);
+        results = new ArrayList<>();
+        digitsMultiSet = new int[10];
+        testMultiSet = new int[10];
+
+        for (N = 1; N < maxN; N++) {
+            minPow = (long) Math.pow(10, N - 1);
+            maxPow = (long) Math.pow(10, N);
+
+            search(9, N, 0);
+        }
+
+        Collections.sort(results);
+
+        return results;
+    }
+
+    private static void genPows (int N){
+        if (N > 20) throw new IllegalArgumentException();
+        pows = new long[10][N + 1];
+        for (int i = 0; i < pows.length; i++) {
+            long p = 1;
+            for (int j = 0; j < pows[i].length; j++) {
+                pows[i][j] = p;
+                p *= i;
             }
-        }return isMinNumber;
-    }
-
-        public static boolean isArmstrong (long N){
-         for (long i = 1; i < N; i++) {
-             if (isMinNumber(i)){
-                 
-
-             }
-
-         }
-
-
-
-    }
-
-
-    public static List<Long> clonesNumber(long N) {
-
-    }
-
-    public static int countDigits(long N) {
-
-        if (N < 100000) {
-            if (N < 10000) {
-                if (N < 1000) {
-                    if (N < 100) {
-                        if (N < 10) {
-                            return 1;
-                        } else return 2;
-                    } else return 3;
-                } else return 4;
-            } else return 5;
-        } else if (N < 100000000) {
-            if (N < 10000000) {
-                if (N < 1000000) {
-                    return 6;
-                } else return 7;
-            } else return 8;
-        } else if (N < 100000000000L) {
-            if (N < 10000000000L) {
-                if (N < 1000000000) {
-                    return 9;
-                } else return 10;
-            } else return 11;
-        } else if (N < Long.MAX_VALUE) {
-            if (N < 1000000000000000000L) {
-                if (N < 100000000000000000L) {
-                    if (N < 10000000000000000L) {
-                        if (N < 1000000000000000L) {
-                            if (N < 100000000000000L) {
-                                if (N < 10000000000000L) {
-                                    if (N < 1000000000000L) {
-                                        return 12;
-                                    } else return 13;
-                                } else return 14;
-                            } else return 15;
-                        } else return 16;
-                    } else return 17;
-                } else return 18;
-            } else return 19;
         }
-        return 0;
     }
+    private static boolean check(long pow) {
+        if (pow >= maxPow) return false;
+        if (pow < minPow) return false;
 
-    public static byte[] masDigits(long N, int digitsNumber) {
-        byte[] mas = new byte[digitsNumber];
-        for (int i = digitsNumber - 1; i >= 0; i--) {
-            mas[i] = (byte) (N % 10);
-            N = N / 10;
+        for (int i = 0; i < 10; i++) {
+            testMultiSet[i] = 0;
         }
-        return mas;
+
+        while (pow > 0) {
+            int i = (int) (pow % 10);
+            testMultiSet[i]++;
+            if (testMultiSet[i] > digitsMultiSet[i]) return false;
+            pow = pow / 10;
+        }
+
+        for (int i = 0; i < 10; i++) {
+            if (testMultiSet[i] != digitsMultiSet[i]) return false;
+        }
+
+        return true;
     }
 
+    private static void search(int digit, int unused, long pow) {
+        if (pow >= maxPow) return;
 
-}
+        if (digit == -1) {
+            if (check(pow) && pow < S) results.add(pow);
+            return;
+        }
+
+        if (digit == 0) {
+            digitsMultiSet[digit] = unused;
+            search(digit - 1, 0, pow + unused * pows[digit][N]);
+        } else {
+            // Check if we can generate more than minimum
+            if (pow + unused * pows[digit][N] < minPow) return;
+
+            long p = pow;
+            for (int i = 0; i <= unused; i++) {
+                digitsMultiSet[digit] = i;
+                search(digit - 1, unused - i, p);
+                if (i != unused) {
+                    p += pows[digit][N];
+                    // Check maximum and break the loop - doesn't help
+                    // if (p >= maxPow) break;
+                }
+            }
+        }
+    }
+
+    }
+
